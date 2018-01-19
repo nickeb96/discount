@@ -41,7 +41,7 @@ push(char *bfr, int size, MMIOT *f)
 /*
  * push a character into the generator input buffer
  */
-static void 
+static void
 pushc(char c, MMIOT *f)
 {
     EXPAND(f->in) = c;
@@ -131,7 +131,7 @@ static void
 Qchar(int c, MMIOT *f)
 {
     block *cur;
-    
+
     if ( S(f->Q) == 0 ) {
 	cur = &EXPAND(f->Q);
 	memset(cur, 0, sizeof *cur);
@@ -141,7 +141,7 @@ Qchar(int c, MMIOT *f)
 	cur = &T(f->Q)[S(f->Q)-1];
 
     EXPAND(cur->b_text) = c;
-    
+
 }
 
 
@@ -205,7 +205,7 @@ ___mkd_reparse(char *bfr, int size, int flags, MMIOT *f, char *esc)
     struct escaped e;
 
     ___mkd_initmmiot(&sub, f->footnotes);
-    
+
     sub.flags = f->flags | flags;
     sub.cb = f->cb;
     sub.ref_prefix = f->ref_prefix;
@@ -221,10 +221,10 @@ ___mkd_reparse(char *bfr, int size, int flags, MMIOT *f, char *esc)
     push(bfr, size, &sub);
     pushc(0, &sub);
     S(sub.in)--;
-    
+
     text(&sub);
     ___mkd_emblock(&sub);
-    
+
     Qwrite(T(sub.out), S(sub.out), f);
     /* inherit the last character printed from the reparsed
      * text;  this way superscripts can work when they're
@@ -270,7 +270,7 @@ puturl(char *s, int size, MMIOT *f, int display)
 	    if ( !( ispunct(c) || isspace(c) ) )
 		Qchar('\\', f);
 	}
-	
+
 	if ( c == '&' )
 	    Qstring("&amp;", f);
 	else if ( c == '<' )
@@ -402,7 +402,7 @@ linkysize(MMIOT *f, Footnote *ref)
 /* extract a <...>-encased url from the input stream.
  * (markdown 1.0.2b8 compatibility; older versions
  * of markdown treated the < and > as syntactic
- * sugar that didn't have to be there.  1.0.2b8 
+ * sugar that didn't have to be there.  1.0.2b8
  * requires a closing >, and then falls into the
  * title or closing )
  */
@@ -432,13 +432,13 @@ linkybroket(MMIOT *f, int image, Footnote *p)
 	good=1;
     else if ( image && (c == '=') && linkysize(f,p) )
 	good=1;
-    else 
+    else
 	good=( c == ')' );
 
     if ( good ) {
 	if ( peek(f, 1) == ')' )
 	    pull(f);
-	    
+
 	___mkd_tidy(&p->link);
     }
 
@@ -484,12 +484,12 @@ linkyurl(MMIOT *f, int image, Footnote *p)
     }
     if ( peek(f, 1) == ')' )
 	pull(f);
-	
+
     ___mkd_tidy(&p->link);
-    
+
     if ( mayneedtotrim && (T(p->link)[S(p->link)-1] == '>') )
 	--S(p->link);
-    
+
     return 1;
 }
 
@@ -500,12 +500,12 @@ linkyurl(MMIOT *f, int image, Footnote *p)
 static struct _protocol {
     char *name;
     int   nlen;
-} protocol[] = { 
+} protocol[] = {
 #define _aprotocol(x)	{ x, (sizeof x)-1 }
-    _aprotocol( "https:" ), 
-    _aprotocol( "http:" ), 
+    _aprotocol( "https:" ),
+    _aprotocol( "http:" ),
     _aprotocol( "news:" ),
-    _aprotocol( "ftp:" ), 
+    _aprotocol( "ftp:" ),
 #undef _aprotocol
 };
 #define NRPROTOCOLS	(sizeof protocol / sizeof protocol[0])
@@ -526,7 +526,7 @@ isautoprefix(char *text, int size)
 
 /*
  * all the tag types that linkylinky can produce are
- * defined by this structure. 
+ * defined by this structure.
  */
 typedef struct linkytype {
     char      *pat;
@@ -585,12 +585,12 @@ static void
 printlinkyref(MMIOT *f, linkytype *tag, char *link, int size)
 {
     char *edit;
-    
+
     if ( f->flags & IS_LABEL )
 	return;
-    
+
     Qstring(tag->link_pfx, f);
-	
+
     if ( tag->kind & IS_URL ) {
 	if ( f->cb && f->cb->e_url && (edit = (*f->cb->e_url)(link, size, f->cb->e_data)) ) {
 	    puturl(edit, strlen(edit), f, 0);
@@ -630,7 +630,7 @@ extra_linky(MMIOT *f, Cstring text, Footnote *ref)
 {
     if ( ref->flags & REFERENCED )
 	return 0;
-	
+
     if ( f->flags & IS_LABEL )
     	___mkd_reparse(T(text), S(text), linkt.flags, f, 0);
     else {
@@ -731,7 +731,7 @@ linkylinky(int image, MMIOT *f)
     int start = mmiottell(f);
     Cstring name;
     Footnote key, *ref;
-		
+
     int status = 0;
     int extra_footnote = 0;
 
@@ -749,7 +749,7 @@ linkylinky(int image, MMIOT *f)
 
 	    if ( isspace(peek(f,1)) )
 		pull(f);
-	    
+
 	    if ( peek(f,1) == '[' ) {
 		pull(f);	/* consume leading '[' */
 		goodlink = linkylabel(f, &key.tag);
@@ -764,7 +764,7 @@ linkylinky(int image, MMIOT *f)
 		if ( (f->flags & MKD_EXTRA_FOOTNOTE) && (!image) && S(name) && T(name)[0] == '^' )
 		    extra_footnote = 1;
 	    }
-	    
+
 	    if ( goodlink ) {
 		if ( !S(key.tag) ) {
 		    DELETE(key.tag);
@@ -808,7 +808,7 @@ cputc(int c, MMIOT *f)
     }
 }
 
- 
+
 /*
  * convert an email address to a string of nonsense
  */
@@ -850,7 +850,7 @@ matchticks(MMIOT *f, int tickchar, int ticks, int *endticks)
 {
     int size, count, c;
     int subsize=0, subtick=0;
-    
+
     *endticks = ticks;
     for (size = 0; (c=peek(f,size+ticks)) != EOF; size ++) {
 	if ( (c == tickchar) && ( count = nrticks(size+ticks,tickchar,f)) ) {
@@ -912,7 +912,7 @@ codespan(MMIOT *f, int size)
 
     if ( size > 1 && peek(f, size-1) == ' ' ) --size;
     if ( peek(f,i) == ' ' ) ++i, --size;
-    
+
     Qstring("<code>", f);
     code(f, cursor(f)+(i-1), size);
     Qstring("</code>", f);
@@ -949,17 +949,17 @@ static int
 maybe_address(char *p, int size)
 {
     int ok = 0;
-    
+
     for ( ;size && (isalnum(*p) || strchr("._-+*", *p)); ++p, --size)
 	;
 
     if ( ! (size && *p == '@') )
 	return 0;
-    
+
     --size, ++p;
 
     if ( size && *p == '.' ) return 0;
-    
+
     for ( ;size && (isalnum(*p) || strchr("._-+", *p)); ++p, --size )
 	if ( *p == '.' && size > 1 ) ok = 1;
 
@@ -978,7 +978,7 @@ process_possible_link(MMIOT *f, int size)
     int address= 0;
     int mailto = 0;
     char *text = cursor(f);
-    
+
     if ( f->flags & MKD_NOLINKS ) return 0;
 
     if ( (size > 7) && strncasecmp(text, "mailto:", 7) == 0 ) {
@@ -988,10 +988,10 @@ process_possible_link(MMIOT *f, int size)
 	address = 1;
 	mailto = 7; 	/* 7 is the length of "mailto:"; we need this */
     }
-    else 
+    else
 	address = maybe_address(text, size);
 
-    if ( address ) { 
+    if ( address ) {
 	Qstring("<a href=\"", f);
 	if ( !mailto ) {
 	    /* supply a mailto: protocol if one wasn't attached */
@@ -1056,7 +1056,7 @@ maybe_tag_or_link(MMIOT *f)
 		    return 0;
 		else
 		    size++;
-	    
+
 	    if ( forbidden_tag(f) )
 		return 0;
 
@@ -1070,7 +1070,7 @@ maybe_tag_or_link(MMIOT *f)
 	    return 1;
 	}
     }
-    
+
     return 0;
 }
 
@@ -1163,6 +1163,16 @@ static struct smarties {
     char *entity;
     int shift;
 } smarties[] = {
+    { '+',  "+/-",      "plusmn", 2 },
+    { '=',  "=/=",      "ne",     2 },
+    { '(',  "(x)",      "times",  2 },
+    { '(',  "(/)",      "divide", 2 },
+    { '1',  "|1/3|",    "#8531",  2 },
+    { '2',  "|2/3|",    "#8532",  2 },
+    { '1',  "|1/8|",    "#8539",  2 },
+    { '3',  "|3/8|",    "#8540",  2 },
+    { '5',  "|5/8|",    "#8541",  2 },
+    { '7',  "|7/8|",    "#8542",  2 },
     { '\'', "'s|",      "rsquo",  0 },
     { '\'', "'t|",      "rsquo",  0 },
     { '\'', "'re|",     "rsquo",  0 },
@@ -1325,7 +1335,7 @@ text(MMIOT *f)
 		    else
 			Qchar(c, f);
 		    break;
-			
+
 	case '!':   if ( peek(f,1) == '[' ) {
 			pull(f);
 			if ( tag_text(f) || !linkylinky(1, f) )
@@ -1398,7 +1408,7 @@ text(MMIOT *f)
 			Qem(f,c,rep);
 		    }
 		    break;
-	
+
 	case '~':   if ( (f->flags & (MKD_NOSTRIKETHROUGH|MKD_TAGTEXT|MKD_STRICT)) || ! tickhandler(f,c,2,0, delspan) )
 			Qchar(c, f);
 		    break;
@@ -1419,7 +1429,7 @@ text(MMIOT *f)
 				    Qchar('\\', f);
 				    shift(f, -1);
 				}
-				
+
 				break;
 		    case '^':   if ( f->flags & (MKD_STRICT|MKD_NOSUPERSCRIPT) ) {
 				    Qchar('\\', f);
@@ -1428,7 +1438,7 @@ text(MMIOT *f)
 				}
 				Qchar(c, f);
 				break;
-				
+
 		    case ':': case '|':
 				if ( f->flags & MKD_NOTABLES ) {
 				    Qchar('\\', f);
@@ -1437,7 +1447,7 @@ text(MMIOT *f)
 				}
 				Qchar(c, f);
 				break;
-				
+
 		    case EOF:	Qchar('\\', f);
 				break;
 
@@ -1446,7 +1456,7 @@ text(MMIOT *f)
 				   && mathhandler(f, '\\', (c =='(')?')':']') )
 				    break;
 				/* else fall through to default */
-			
+
 		    default:    if ( escaped(f,c) ||
 				     strchr(">#.-+{}]![*_\\()`", c) )
 				    Qchar(c, f);
@@ -1479,7 +1489,7 @@ text(MMIOT *f)
 			Qchar('$', f);
 		    }
 		    /* fall through to default */
-	
+
 	default:    f->last = c;
 		    Qchar(c, f);
 		    break;
@@ -1540,7 +1550,7 @@ splat(Line *p, char *block, Istring align, int force, MMIOT *f)
     ___mkd_tidy(&p->text);
     if ( T(p->text)[S(p->text)-1] == '|' )
 	--S(p->text);
-    
+
     Qstring("<tr>\n", f);
     while ( idx < S(p->text) ) {
 	first = idx;
@@ -1601,7 +1611,7 @@ printtable(Paragraph *pp, MMIOT *f)
     for (p=T(dash->text), start=dash->dle; start < S(dash->text); ) {
 	char first, last;
 	int end;
-	
+
 	last=first=0;
 	for (end=start ; (end < S(dash->text)) && p[end] != '|'; ++ end ) {
 	    if ( p[end] == '\\' )
@@ -1703,10 +1713,10 @@ static void
 printhtml(Line *t, MMIOT *f)
 {
     int blanks;
-    
+
     for ( blanks=0; t ; t = t->next )
 	if ( S(t->text) ) {
-	    for ( ; blanks; --blanks ) 
+	    for ( ; blanks; --blanks )
 		Qchar('\n', f);
 
 	    Qwrite(T(t->text), S(t->text), f);
@@ -1785,7 +1795,7 @@ static Paragraph*
 display(Paragraph *p, MMIOT *f)
 {
     if ( !p ) return 0;
-    
+
     switch ( p->typ ) {
     case STYLE:
     case WHITESPACE:
@@ -1794,15 +1804,15 @@ display(Paragraph *p, MMIOT *f)
     case HTML:
 	printhtml(p->text, f);
 	break;
-	
+
     case CODE:
 	printcode(p->text, p->lang, f);
 	break;
-	
+
     case QUOTE:
 	htmlify(p->down, p->ident ? "div" : "blockquote", p->ident, f);
 	break;
-	
+
     case UL:
     case OL:
     case AL:
@@ -1828,7 +1838,7 @@ display(Paragraph *p, MMIOT *f)
     case SOURCE:
 	htmlify(p->down, 0, 0, f);
 	break;
-	
+
     default:
 	printblock(p, f);
 	break;
@@ -1849,7 +1859,7 @@ mkd_extra_footnotes(MMIOT *m)
 	return;
 
     Csprintf(&m->out, "\n<div class=\"footnotes\">\n<hr/>\n<ol>\n");
-    
+
     for ( i=1; i <= m->footnotes->reference; i++ ) {
 	for ( j=0; j < S(m->footnotes->note); j++ ) {
 	    t = &T(m->footnotes->note)[j];
@@ -1874,7 +1884,7 @@ int
 mkd_document(Document *p, char **res)
 {
     int size;
-    
+
     if ( p && p->compiled ) {
 	if ( ! p->html ) {
 	    htmlify(p->code, 0, 0, p->ctx);
@@ -1882,7 +1892,7 @@ mkd_document(Document *p, char **res)
 		mkd_extra_footnotes(p->ctx);
 	    p->html = 1;
 	    size = S(p->ctx->out);
-	
+
 	    if ( (size == 0) || T(p->ctx->out)[size-1] ) {
 		/* Add a null byte at the end of the generated html,
 		 * but pretend it doesn't exist.
@@ -1891,7 +1901,7 @@ mkd_document(Document *p, char **res)
 		--S(p->ctx->out);
 	    }
 	}
-	
+
 	*res = T(p->ctx->out);
 	return S(p->ctx->out);
     }
